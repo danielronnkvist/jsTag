@@ -2,7 +2,7 @@
 * jsTag JavaScript Library - Editing tags based on angularJS 
 * Git: https://github.com/eranhirs/jsTag/tree/master
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 04/24/2015 11:49
+* Compiled At: 04/24/2015 16:23
 **************************************************/
 'use strict';
 var jsTag = angular.module('jsTag', []);
@@ -526,38 +526,43 @@ jsTag.controller('JSTagMainCtrl', ['$attrs', '$scope', 'InputService', 'TagsInpu
   } catch(e) {
     console.log("jsTag Error: Invalid user options, using defaults only");
   }
-  
+
   // Copy so we don't override original values
   var options = angular.copy(jsTagDefaults);
-  
+
   // Use user defined options
   if (userOptions !== undefined) {
     userOptions.texts = angular.extend(options.texts, userOptions.texts || {});
-    angular.extend(options, userOptions);
+    for (var key in options) {
+      if(userOptions[key]) {
+        options[key] = userOptions[key];
+      }
+    }
   }
-  
+
   $scope.options = options;
-  
+
   // Export handlers to view
   $scope.tagsInputService = new TagsInputService($scope.options);
   $scope.inputService = new InputService($scope.options);
-  
+
   // Export tagsCollection separately since it's used alot
   var tagsCollection = $scope.tagsInputService.tagsCollection;
   $scope.tagsCollection = tagsCollection;
-    
+
   // TODO: Should be inside inside tagsCollection.js
   // On every change to editedTags keep isThereAnEditedTag posted
   $scope.$watch('tagsCollection._editedTag', function(newValue, oldValue) {
     $scope.isThereAnEditedTag = newValue !== null;
   });
-  
+
   // TODO: Should be inside inside tagsCollection.js
   // On every change to activeTags keep isThereAnActiveTag posted
   $scope.$watchCollection('tagsCollection._activeTags', function(newValue, oldValue) {
     $scope.isThereAnActiveTag = newValue.length > 0;
   });
 }]);
+
 var jsTag = angular.module('jsTag');
 
 // TODO: Maybe add A to 'restrict: E' for support in IE 8?
